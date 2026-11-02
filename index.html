@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bianca + Cauê, 02 de dezembro de 2026</title>
+<meta name="description" content="Te convidamos para celebrar o nosso casamento. Quarta-feira, 02 de dezembro de 2026, às 12h30, no Rio de Janeiro.">
+<meta name="theme-color" content="#1d2421">
+
+<!-- Prévia do link no WhatsApp -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Bianca + Cauê">
+<meta property="og:description" content="Te convidamos para celebrar o nosso casamento. 02 de dezembro de 2026.">
+<meta property="og:url" content="https://caueissa.github.io/convite-bianca-caue/">
+<meta property="og:image" content="https://caueissa.github.io/convite-bianca-caue/convite-final.jpg">
+<meta property="og:image:width" content="1080">
+<meta property="og:image:height" content="1350">
+<meta property="og:image:alt" content="Convite de casamento de Bianca e Cauê, com ramo de eucalipto">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,300;1,500&family=Bodoni+Moda:opsz,wght@6..96,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css">
+<script>document.documentElement.classList.add("js");</script>
+</head>
+<body>
+  <!-- Cenário: parede, monograma, ramo, luz e poeira -->
+  <div id="palco" aria-hidden="true">
+    <div class="parede"></div>
+    <div id="mono"><span class="l b">B</span><span class="l c">C</span></div>
+    <canvas id="c-ramo"></canvas>
+    <canvas id="c-luz"></canvas>
+    <div class="grao"></div>
+    <canvas id="c-poeira"></canvas>
+  </div>
+
+  <div id="entrada" role="dialog" aria-labelledby="entrada-nome">
+    <p class="entrada-mono" aria-hidden="true"><span>B</span><span>C</span></p>
+    <p id="entrada-nome" class="entrada-nome">Bianca + Cauê</p>
+    <p class="entrada-aviso">Esta página tem som ambiente</p>
+    <div class="entrada-botoes">
+      <button id="entrar-som" class="botao botao-claro" type="button">Entrar com som</button>
+      <button id="entrar-mudo" class="botao botao-linha" type="button">Entrar sem som</button>
+    </div>
+  </div>
+
+  <button id="pular" class="flutuante pular" type="button">Ir para o convite</button>
+  <button id="som" class="flutuante som" type="button" aria-pressed="false" aria-label="Som ambiente">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z"/>
+      <path class="onda" d="M15.5 9a4.2 4.2 0 0 1 0 6"/>
+      <path class="onda" d="M18 6.5a7.8 7.8 0 0 1 0 11"/>
+      <path class="mudo" d="M16 9.5l5 5M21 9.5l-5 5"/>
+    </svg>
+  </button>
+
+  <p id="dica" class="dica" aria-hidden="true"><span>Role devagar</span><i></i></p>
+
+  <main id="convite">
+    <p id="frase" class="frase">Existe um dia que queremos dividir com você.</p>
+
+    <div id="alvo-mono" class="alvo-mono">
+      <h1 id="nome" class="nome">Bianca + Cauê</h1>
+    </div>
+
+    <div class="detalhes">
+      <p id="texto" class="texto">Te convidamos<br>para celebrar o nosso casamento</p>
+
+      <div id="data" class="data">
+        <p class="mes">Dezembro</p>
+        <p class="lado esq">Quarta-feira</p>
+        <p class="num">02</p>
+        <p class="lado dir">12h30</p>
+        <p class="ano">2026</p>
+      </div>
+
+      <div id="local" class="local">
+        <p class="nome-local">12º RCPN, Shopping Via Parque</p>
+        <p class="end">Av. Ayrton Senna, 3000, Loja 2033A</p>
+        <p class="end">Rio de Janeiro</p>
+      </div>
+
+      <div id="almoco" class="almoco">
+        <i class="fio"></i>
+        <p>Almoço a partir das 13h30</p>
+        <p>Salão de festas do condomínio</p>
+      </div>
+
+      <div id="acoes" class="acoes">
+        <button id="compartilhar" class="botao botao-verde" type="button">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.5M8.2 13.2l7.6 4.5"/></svg>
+          Compartilhar no WhatsApp
+        </button>
+        <a id="baixar" class="botao botao-linha-escura" href="convite-final.jpg" download="convite-bianca-caue.jpg">Baixar imagem</a>
+      </div>
+    </div>
+  </main>
+
+  <div id="trilha" aria-hidden="true"></div>
+
+  <noscript><style>#entrada,#pular,#som,#dica,#frase,#trilha{display:none}</style></noscript>
+
+  <script src="som.js"></script>
+  <script src="cenario.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
