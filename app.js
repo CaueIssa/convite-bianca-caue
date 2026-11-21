@@ -111,6 +111,8 @@
     var ligado = Som.ligado();
     botaoSom.setAttribute("aria-pressed", ligado ? "true" : "false");
     botaoSom.setAttribute("aria-label", ligado ? "Desligar som ambiente" : "Ligar som ambiente");
+    // A lista de presentes lembra a escolha: quem está com som ouve a música de lá
+    try { sessionStorage.setItem("convite-som", ligado ? "1" : "0"); } catch (e) {}
   }
   function entrar(comSom) {
     if (comSom) Som.ligar();

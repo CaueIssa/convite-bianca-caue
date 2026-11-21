@@ -204,6 +204,30 @@ html.js .itens > li.visto .carimbo svg { animation: carimbar .55s cubic-bezier(.
 .rodape p + p { margin-top: 4px; font-size: 18px; }
 .rodape a { display: inline-flex; align-items: center; min-height: 44px; text-underline-offset: 4px; text-decoration-color: var(--fio); }
 
+/* Botão da música: pílula de papel no canto; tocando, as barrinhas dançam no ritmo (104 bpm) */
+.musica {
+  position: fixed; z-index: 30; top: max(12px, env(safe-area-inset-top)); right: 14px;
+  display: inline-flex; align-items: center; gap: 9px; min-height: 42px; padding: 0 16px 0 13px;
+  font: inherit; font-size: 12.5px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--tinta-suave); cursor: pointer; -webkit-tap-highlight-color: transparent;
+  background: rgba(255, 253, 248, .88); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  border: 1px solid var(--fio); border-radius: 999px;
+  box-shadow: 0 8px 20px -14px rgba(38, 40, 36, .45);
+  transition: color .3s ease, border-color .3s ease, transform .2s ease;
+}
+.musica:hover { border-color: #c9c2ad; }
+.musica:active { transform: scale(.97); }
+.musica:focus-visible { outline: 2px solid var(--salvia); outline-offset: 3px; }
+.musica-icone { display: inline-flex; align-items: flex-end; gap: 2px; height: 14px; }
+.musica-icone i { display: block; width: 2.5px; height: 4px; border-radius: 2px; background: currentColor; opacity: .7; }
+.musica.tocando { color: var(--salvia-escura); border-color: rgba(92, 122, 96, .45); }
+.musica.tocando .musica-icone i { opacity: 1; animation: barrinha .577s ease-in-out infinite alternate; }
+.musica.tocando .musica-icone i:nth-child(2) { animation-delay: -.29s; }
+.musica.tocando .musica-icone i:nth-child(3) { animation-delay: -.14s; }
+.musica.tocando .musica-icone i:nth-child(4) { animation-delay: -.43s; }
+@keyframes barrinha { from { height: 3px; } to { height: 14px; } }
+@media (max-width: 600px) { .musica { right: 12px; min-height: 40px; padding: 0 14px 0 12px; } }
+
 /* Chão onde o Apolo anda: a lista se apaga suavemente atrás dele */
 .chao {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 2; pointer-events: none;
@@ -370,7 +394,7 @@ html.js .itens > li.visto .carimbo svg { animation: carimbar .55s cubic-bezier(.
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sombras { animation: none; }
+  .sombras, .musica.tocando .musica-icone i { animation: none; }
   html.js .secao-titulo, html.js .itens > li { opacity: 1; transform: none; transition: none; }
   html.js .itens > li .carimbo svg { opacity: .88; animation: none !important; }
   .modal-caixa, .modal-fundo, .balao-miolo, .botao, .item::before, .ramo { transition: none; }

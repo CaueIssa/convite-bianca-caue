@@ -51,3 +51,10 @@ Enquanto ela não existir, o retrato mostra o desenho do Apolo.
 No computador ele segue o cursor; no celular corre até onde a pessoa toca e,
 tocado, pula e conta uma fofoca. Ele reage a cada presente aberto e comemora quando
 alguém copia o Pix. Quem usa "reduzir movimento" no aparelho vê o Apolo parado.
+
+### Música da lista
+
+`musica.js` toca uma música alegre composta para a página (ukulele, glockenspiel,
+kalimba, baixinho e chocalho, em Fá maior), gerada pelo navegador, sem arquivo de áudio.
+Ela começa pelo botão "Música" no canto da página. Quem entrou no convite com som ouve
+a música no primeiro toque na lista. Com a música tocando, o Apolo balança a cabeça no ritmo.

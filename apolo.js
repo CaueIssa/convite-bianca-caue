@@ -46,20 +46,24 @@ window.Apolo = (function () {
       sombra: q(".a-sombra"), rabo: q(".a-rabo"), tronco: q(".a-tronco"), cabeca: q(".a-cabeca"),
       orelha: q(".a-orelha"), palpebra: q(".a-palpebra"), lingua: q(".a-lingua"), sobrancelha: q(".a-sobrancelha"),
       // Trote: pares diagonais. Galope: dianteiras juntas, traseiras juntas.
-      // senta / deita: [giro, esticar, desloca x, desloca y] de cada pata na pose.
+      // Cada pata tem dois segmentos: a perna gira no ombro/quadril e a pata no punho/jarrete.
+      // senta / deita: [giro, esticar a perna, desloca x, desloca y, giro da pata].
+      // Sentado, as patas da frente ficam plantadas onde estavam; deitado, as patas apoiam no chão.
       patas: [
-        { el: q(".a-pata-tl"), x: 36.5, frente: false, trote: Math.PI, galope: Math.PI, senta: [-72, .7, -3.9, 18.8], deita: [0, .35, 0, 21] },
-        { el: q(".a-pata-fl"), x: 80.5, frente: true, trote: 0, galope: 0, senta: [0, .95, -8.4, -.4], deita: [-78, .8, 0, 24] },
-        { el: q(".a-pata-tp"), x: 46.5, frente: false, trote: 0, galope: Math.PI + .55, senta: [-72, .7, -5, 14.5], deita: [0, .35, 0, 21] },
-        { el: q(".a-pata-fp"), x: 90.5, frente: true, trote: Math.PI, galope: .55, senta: [0, 1.08, -9.4, -4.8], deita: [-78, .8, 0, 24] }
+        pata(".a-pata-tl", { x: 36.5, frente: false, trote: Math.PI, galope: Math.PI, senta: [-70, .6, -4, 19.2, 70], deita: [10, .35, 0, 16.4, -10] }),
+        pata(".a-pata-fl", { x: 80.5, frente: true, trote: 0, galope: 0, senta: [-14, 1.06, -8.4, -.4, 14], deita: [-80, .8, 0, 20.7, 80] }),
+        pata(".a-pata-tp", { x: 46.5, frente: false, trote: 0, galope: Math.PI + .55, senta: [-70, .6, -5, 19.2, 70], deita: [10, .35, 0, 16.4, -10] }),
+        pata(".a-pata-fp", { x: 90.5, frente: true, trote: Math.PI, galope: .55, senta: [-14, 1.25, -9.4, -4.8, 14], deita: [-80, .8, 0, 20.7, 80] })
       ]
     };
+    function pata(sel, o) { o.el = q(sel); o.cima = o.el.querySelector(".a-cima"); o.baixo = o.el.querySelector(".a-baixo"); return o; }
   }
 
   // Aplica uma pose no desenho (serve para o Apolo vivo e para o retrato).
   // Sentado: o quadril desce até o chão, o peito sobe, as patas de trás dobram
   // para a frente e o rabo vai junto com o quadril.
-  function posar(P, e) {
+  function posar(P, e, ajuste) {
+    if (ajuste) for (var k in ajuste) e[k] = ajuste[k];
     var se = e.sentado, de = e.deitado;
     var em = Math.max(0, 1 - se - de);   // peso da pose "em pé"
     P.tronco.setAttribute("transform",
@@ -69,11 +73,15 @@ window.Apolo = (function () {
       " translate(60 64) scale(" + n4(e.respX) + " " + n4(e.respY) + ") translate(-60 -64)");
     for (var i = 0; i < 4; i++) {
       var p = P.patas[i], f = p.frente, S = p.senta, D = p.deita;
+      var flexao = e.flexoes ? e.flexoes[i] : 0;
       var rot = em * e.passos[i] + se * S[0] + de * D[0] + e.noAr * (f ? -30 : 32);
       var sy = em + se * S[1] + de * D[1] - (f ? e.inclina * .02 : 0);
       var tx = se * S[2] + de * D[2], ty = se * S[3] + de * D[3];
-      p.el.setAttribute("transform", "translate(" + n(tx) + " " + n(ty) + ") rotate(" + n(rot) + " " + p.x + " 64)" +
-        " translate(" + p.x + " 63) scale(1 " + n4(sy) + ") translate(" + (-p.x) + " -63)");
+      p.el.setAttribute("transform", "translate(" + n(tx) + " " + n(ty) + ") rotate(" + n(rot) + " " + p.x + " 64)");
+      // Só a perna estica ou encolhe; a pata acompanha a ponta dela e mantém o tamanho
+      p.cima.setAttribute("transform", "translate(0 " + n(63 * (1 - sy)) + ") scale(1 " + n4(sy) + ")");
+      var rotB = em * flexao + se * S[4] + de * D[4] + e.noAr * (f ? 34 : -24);
+      p.baixo.setAttribute("transform", "translate(0 " + n(25 * (sy - 1)) + ") rotate(" + n(rotB) + " " + p.x + " 88)");
     }
     // A cabeça compensa o giro do corpo: sentado, ele continua olhando para frente
     P.cabeca.setAttribute("transform", "rotate(" + n(e.cabeca + 26 * se - 3 * de) + " 88 50)");
@@ -106,12 +114,13 @@ window.Apolo = (function () {
   var x = -LARG - 40, v = 0, alvoX = Math.min(W * .28, 340), velMax = 220, aceS = 0;
   var face = new Mola(1, 3, 1), sentado = new Mola(0, 1.8, 1), deitado = new Mola(0, 1.3, 1);
   var cab = new Mola(0, 2.4, .8), ore = new Mola(0, 2.1, .18), estica = new Mola(1, 3.4, .3);
-  var palp = 0, ling = 0, alegria = .5, cansaco = 0, inclina = 0, sobr = 0;
+  var palp = 0, ling = 0, alegria = .5, cansaco = 0, inclina = 0, sobr = 0, ritmo = 0;
   var fase = 0, faseRabo = 0, faseResp = 0, y = 0, vy = 0, pulo = null;
   var modo = "livre", quadro = null, itemAtual = null, humorQuadro = "neutro", humorPasse = null, reagiu = false;
   var mouse = { x: 0, y: 0, t: -99 }, chamado = null, ultimaAcao = inicio;
   var proxPasseio = inicio + 5, piscaAte = 0, proxPisca = inicio + 2.5, linguaAte = 0;
   var pano = null, falaPendente = null, faceForcada = 0, saudou = false, dtAtual = 0;
+  var proxFarejo = inicio + 7, farejaAte = 0;
 
   function acao() { ultimaAcao = agora(); }
 
@@ -147,11 +156,8 @@ window.Apolo = (function () {
   }
   function esconderBalao() { balaoAte = 0; if (elBalao) elBalao.classList.remove("visivel"); }
   function topoCabeca() {
-    var fs = face.x >= 0 ? 1 : -1, s = lim(sentado.x, 0, 1), d = lim(deitado.x, 0, 1);
-    return {
-      x: x + LARG / 2 + (30 - 22 * s) * U * fs,
-      y: CHAO - (84 + 3 * s - 18 * d) * U - y
-    };
+    var r = P.cabeca.getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top };
   }
   function posicionarBalao() {
     var c = topoCabeca();
@@ -311,6 +317,8 @@ window.Apolo = (function () {
         alvoX = 16 + Math.random() * Math.max(20, W - LARG - 32);
         proxPasseio = T + 6 + Math.random() * 7;
       }
+      if (parado <= 20 && Math.abs(v) < 12 && T > proxFarejo) { farejaAte = T + 1.6; proxFarejo = T + 5 + Math.random() * 6; }
+      if (T < farejaAte) { alvoX = x; I.cabecaFixa = 34 + 2.5 * Math.sin(T * 26); I.orelha = 5; I.alegria = .5; }
     }
     if (humorPasse) humorNa(I, humorPasse);
     return I;
@@ -318,7 +326,7 @@ window.Apolo = (function () {
   function falaPendenteEm() { return falaPendente ? falaPendente.em : 0; }
 
   /* ---------- Quadro a quadro ---------- */
-  var passos = [0, 0, 0, 0], ultimo = agora();
+  var passos = [0, 0, 0, 0], flexoes = [0, 0, 0, 0], ultimo = agora();
   function quadroAnim() {
     var T = agora(), dt = Math.min(1 / 30, Math.max(0, T - ultimo)); ultimo = T; dtAtual = dt;
     var I = decidir(T), cx = x + LARG / 2;
@@ -350,9 +358,11 @@ window.Apolo = (function () {
     // Marcha: o ciclo das patas avança com a distância percorrida
     fase += Math.abs(v) * dt / (U * mis(46, 118, s)) * Math.PI * 2;
     var gal = suave(.55, .9, s), amp = 34 * suave(0, .45, s);
+    var dobra = suave(0, .3, s);
     for (var i = 0; i < 4; i++) {
-      var p = P.patas[i];
-      passos[i] = amp * Math.sin(fase + mis(p.trote, p.galope, gal));
+      var p = P.patas[i], ph = fase + mis(p.trote, p.galope, gal);
+      passos[i] = amp * Math.sin(ph);
+      flexoes[i] = Math.max(0, -Math.cos(ph)) * dobra * (p.frente ? 42 : -26);
     }
 
     // Cansaço, respiração e língua de fora depois de correr
@@ -377,7 +387,7 @@ window.Apolo = (function () {
       var se = lim(sentado.x, 0, 1), de = lim(deitado.x, 0, 1);
       var hx = cx + (33 - 22 * se) * U * fs, hy = CHAO - (67 + 5 * se - 16 * de) * U - y;
       var dxl = fs > 0 ? I.olhar.x - hx : hx - I.olhar.x;
-      alvoCab = lim(Math.atan2(I.olhar.y - hy, Math.max(dxl, 50)) * 180 / Math.PI, -40, 28);
+      alvoCab = lim(Math.atan2(I.olhar.y - hy, Math.max(dxl, 60)) * 180 / Math.PI, -24, 24);
     }
     alvoCab += I.cabeca;
     if (I.cabecaFixa !== null) alvoCab = I.cabecaFixa;
@@ -388,7 +398,12 @@ window.Apolo = (function () {
     ore.passo(dt);
 
     // Rabo: mais alto e mais rápido quanto mais feliz; para trás na corrida
-    alegria = aprox(alegria, I.alegria, 2.5, dt);
+    // Com música, ele fica mais animado e, parado, balança a cabeça no ritmo
+    var comMusica = !!(window.Musica && Musica.ligada()) && modo !== "dormindo";
+    var balancaCabeca = comMusica && !pano && I.cabecaFixa === null && Math.abs(v) < 25 && y === 0;
+    ritmo = aprox(ritmo, balancaCabeca ? 1 : 0, 4, dt);
+    var nod = ritmo ? ritmo * 4.5 * Math.sin(Musica.batida() * Math.PI * 2) : 0;
+    alegria = aprox(alegria, comMusica && modo === "livre" ? Math.max(I.alegria, .7) : I.alegria, 2.5, dt);
     faseRabo += dt * Math.PI * 2 * mis(.5, 3.8, alegria);
     var rabo = mis(-10, 4, alegria) + Math.sin(faseRabo) * mis(5, 24, alegria) - 16 * s;
 
@@ -407,7 +422,7 @@ window.Apolo = (function () {
       bob: -Math.abs(Math.sin(fase)) * mis(0, 2.8, s),
       pitch: Math.sin(fase) * 4 * gal + lim(-vy / 600, -1, 1) * 9 * noAr,
       inclina: inclina, respX: 1 + resp * .006 * (1 + ofeg), respY: 1 + resp * .02 * (1 + ofeg * .6),
-      passos: passos, noAr: noAr, cabeca: cab.x, orelha: ore.x, palpebra: palp, sobrancelha: sobr,
+      passos: passos, flexoes: flexoes, noAr: noAr, cabeca: cab.x + nod, orelha: ore.x - nod * .6, palpebra: palp, sobrancelha: sobr,
       lingua: ling * (.84 + .16 * Math.sin(faseResp * 2)), rabo: rabo,
       sombraY: y / U, sombraK: 1 - lim(y / 140, 0, .45)
     });
@@ -511,7 +526,7 @@ window.Apolo = (function () {
       falar(texto, 3.6);
     },
     // Copia o desenho, sentado e de língua de fora, para usar como retrato
-    retrato: function (alvo) {
+    retrato: function (alvo, ajuste) {
       if (!alvo) return;
       var svg = raiz.querySelector("svg").cloneNode(true);
       // Retrato parado ganha textura de aquarela (no Apolo animado ficaria pesado)
@@ -521,8 +536,9 @@ window.Apolo = (function () {
       svg.appendChild(g);
       posar(partes(svg), {
         sentado: 1, deitado: 0, bob: 0, pitch: 0, inclina: 0, respX: 1, respY: 1, passos: [0, 0, 0, 0],
-        noAr: 0, cabeca: -6, orelha: 4, palpebra: 0, lingua: 1, rabo: 10, sombraY: 0, sombraK: 1
-      });
+        noAr: 0, cabeca: -6, orelha: 4, palpebra: 0, lingua: 1, rabo: 10, sombraY: 0, sombraK: 1,
+        sobrancelha: 0
+      }, ajuste);
       alvo.appendChild(svg);
     }
   };

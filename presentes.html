@@ -76,6 +76,12 @@
     </g>
   </svg>
 
+  <!-- Música (musica.js): toca só depois de um toque, como pedem os navegadores -->
+  <button id="musica" class="musica" type="button" aria-pressed="false" aria-label="Ligar a música">
+    <span class="musica-icone" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <span class="musica-texto">Música</span>
+  </button>
+
   <main class="pagina">
     <a class="voltar" href="./">Voltar ao convite</a>
 
@@ -125,8 +131,8 @@
           <path d="M11.5,34 q2.6,5.4 7.4,9.2 M16,32.6 q4,5.6 10.4,9.6 M10,38.6 q3.4,4.6 8,7.4" fill="none" stroke="#C48A4C" stroke-width=".9" stroke-linecap="round" opacity=".5"/>
         </g>
         <!-- patas do lado de lá -->
-        <g class="a-pata-tl"><path d="M32,66.5 C32,63 34,62 36.5,62 C39,62 41,63 41,66.5 L41,92 C41,93.5 42.5,94 44,94.5 C46,95.2 45.5,97.4 43,97.4 L34.6,97.4 C32.8,97.4 32,96.4 32,94.6 Z" fill="url(#ap-pata-longe)"/></g>
-        <g class="a-pata-fl"><path d="M76,66.5 C76,63 78,62 80.5,62 C83,62 85,63 85,66.5 L85,92 C85,93.5 86.5,94 88,94.5 C90,95.2 89.5,97.4 87,97.4 L78.6,97.4 C76.8,97.4 76,96.4 76,94.6 Z" fill="url(#ap-pata-longe)"/></g>
+        <g class="a-pata-tl"><g class="a-cima"><path d="M32,66.5 C32,63 34,62 36.5,62 C39,62 41,63 41,66.5 L41,88.6 L32,88.6 Z" fill="url(#ap-pata-longe)"/></g><g class="a-baixo"><path d="M32,87.6 L41,87.6 L41,92 C41,93.5 42.5,94 44,94.5 C46,95.2 45.5,97.4 43,97.4 L34.6,97.4 C32.8,97.4 32,96.4 32,94.6 Z" fill="url(#ap-pata-longe)"/></g></g>
+        <g class="a-pata-fl"><g class="a-cima"><path d="M76,66.5 C76,63 78,62 80.5,62 C83,62 85,63 85,66.5 L85,88.6 L76,88.6 Z" fill="url(#ap-pata-longe)"/></g><g class="a-baixo"><path d="M76,87.6 L85,87.6 L85,92 C85,93.5 86.5,94 88,94.5 C90,95.2 89.5,97.4 87,97.4 L78.6,97.4 C76.8,97.4 76,96.4 76,94.6 Z" fill="url(#ap-pata-longe)"/></g></g>
         <!-- corpo: a cabeça vive dentro dele e acompanha trote e poses -->
         <g class="a-tronco">
           <path d="M30,47 C40,40 70,40 84,42 C93,44 97,52 95,60 C93,68 86,73 76,74 C64,75 52,74 44,72 C36,70 28,66 27,58 C26,53 27,49 30,47 Z" fill="url(#ap-pelo)"/>
@@ -151,8 +157,8 @@
           </g>
         </g>
         <!-- patas do lado de cá -->
-        <g class="a-pata-tp"><path d="M42,66.5 C42,63 44,62 46.5,62 C49,62 51,63 51,66.5 L51,92 C51,93.5 52.5,94 54,94.5 C56,95.2 55.5,97.4 53,97.4 L44.6,97.4 C42.8,97.4 42,96.4 42,94.6 Z" fill="url(#ap-pata)"/></g>
-        <g class="a-pata-fp"><path d="M86,66.5 C86,63 88,62 90.5,62 C93,62 95,63 95,66.5 L95,92 C95,93.5 96.5,94 98,94.5 C100,95.2 99.5,97.4 97,97.4 L88.6,97.4 C86.8,97.4 86,96.4 86,94.6 Z" fill="url(#ap-pata)"/></g>
+        <g class="a-pata-tp"><g class="a-cima"><path d="M42,66.5 C42,63 44,62 46.5,62 C49,62 51,63 51,66.5 L51,88.6 L42,88.6 Z" fill="url(#ap-pata)"/></g><g class="a-baixo"><path d="M42,87.6 L51,87.6 L51,92 C51,93.5 52.5,94 54,94.5 C56,95.2 55.5,97.4 53,97.4 L44.6,97.4 C42.8,97.4 42,96.4 42,94.6 Z" fill="url(#ap-pata)"/></g></g>
+        <g class="a-pata-fp"><g class="a-cima"><path d="M86,66.5 C86,63 88,62 90.5,62 C93,62 95,63 95,66.5 L95,88.6 L86,88.6 Z" fill="url(#ap-pata)"/></g><g class="a-baixo"><path d="M86,87.6 L95,87.6 L95,92 C95,93.5 96.5,94 98,94.5 C100,95.2 99.5,97.4 97,97.4 L88.6,97.4 C86.8,97.4 86,96.4 86,94.6 Z" fill="url(#ap-pata)"/></g></g>
       </svg>
     </div>
     <button class="apolo-toque" type="button" aria-label="Apolo, o cachorro. Toque para ouvir uma fofoca."></button>
@@ -195,5 +201,6 @@
   <script src="ramo.js"></script>
   <script src="apolo.js"></script>
   <script src="presentes.js"></script>
+  <script src="musica.js"></script>
 </body>
 </html>
