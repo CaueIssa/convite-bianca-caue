@@ -90,10 +90,13 @@ html:not(.js) #convite { position: relative; min-height: 100dvh; padding: 24px 1
 .almoco p { font-size: calc(var(--u) * 25); line-height: 1.5; letter-spacing: .12em; }
 .fio { display: block; width: calc(var(--u) * 60); height: 1px; background: var(--fio); margin: 0 auto calc(var(--u) * 22); }
 
+/* Celular: compartilhar ocupa a linha; baixar e lista de presentes dividem a de baixo */
 .acoes {
-  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
   margin-top: calc(var(--u) * 40); pointer-events: auto;
 }
+.acoes #compartilhar { grid-column: 1 / -1; }
+.acoes .botao-linha-escura { padding: 0 10px; font-size: 13px; letter-spacing: .06em; line-height: 1.15; text-align: center; }
 
 .botao {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
@@ -165,8 +168,8 @@ html.js #acoes { visibility: hidden; }
   :root { --u: min(calc(100vw / 1480), calc(100dvh / 900)); }
   #convite { flex-direction: row; gap: calc(var(--u) * 50); }
   .frase { font-size: 24px; }
-  .botao { min-height: 44px; font-size: 13px; padding: 0 12px; white-space: nowrap; }
-  .acoes { width: auto; flex-wrap: nowrap; margin-top: 10px; }
+  .botao { min-height: 40px; font-size: 13px; padding: 0 12px; }
+  .acoes { gap: 6px; margin-top: 10px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -174,7 +177,9 @@ html.js #acoes { visibility: hidden; }
   #entrada, .botao, .flutuante, .dica { transition: none; }
 }
 
-@media (min-width: 700px) {
-  .detalhes > .acoes { width: auto; flex-wrap: nowrap; }
+/* Computador: os três botões lado a lado (celular deitado fica com a grade acima) */
+@media (min-width: 760px) and (min-height: 521px) {
+  .detalhes > .acoes { display: flex; flex-wrap: nowrap; justify-content: center; width: auto; }
+  .acoes .botao-linha-escura { padding: 0 18px; font-size: 15px; letter-spacing: .08em; }
   .botao { white-space: nowrap; }
 }
