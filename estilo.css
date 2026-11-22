@@ -86,17 +86,12 @@ html:not(.js) #convite { position: relative; min-height: 100dvh; padding: 24px 1
 .nome-local { font-size: calc(var(--u) * 30); line-height: 1.4; letter-spacing: .13em; font-weight: 700; }
 .end { font-size: calc(var(--u) * 25); line-height: 1.55; letter-spacing: .12em; }
 
-.almoco { margin-top: calc(var(--u) * 28); color: var(--tinta-suave); }
-.almoco p { font-size: calc(var(--u) * 25); line-height: 1.5; letter-spacing: .12em; }
-.fio { display: block; width: calc(var(--u) * 60); height: 1px; background: var(--fio); margin: 0 auto calc(var(--u) * 22); }
-
-/* Celular: compartilhar ocupa a linha; baixar e lista de presentes dividem a de baixo */
+/* Celular: lista de presentes e baixar imagem dividem a linha */
 .acoes {
   display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-  margin-top: calc(var(--u) * 40); pointer-events: auto;
+  margin-top: calc(var(--u) * 44); pointer-events: auto;
 }
-.acoes #compartilhar { grid-column: 1 / -1; }
-.acoes .botao-linha-escura { padding: 0 10px; font-size: 13px; letter-spacing: .06em; line-height: 1.15; text-align: center; }
+.acoes .botao { padding: 0 10px; font-size: 13px; letter-spacing: .06em; line-height: 1.15; text-align: center; }
 
 .botao {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
@@ -123,9 +118,37 @@ html:not(.js) #convite { position: relative; min-height: 100dvh; padding: 24px 1
 }
 html.js #entrada { display: flex; }
 #entrada.saindo { opacity: 0; pointer-events: none; }
-.entrada-mono { font-size: clamp(120px, 26vh, 220px); line-height: .9; font-weight: 300; font-style: italic; color: #93ab94; }
-.entrada-mono span + span { margin-left: -.1em; position: relative; top: .1em; }
-.entrada-nome { margin-top: 30px; font-size: clamp(20px, 3vh, 28px); letter-spacing: .28em; padding-left: .28em; text-transform: uppercase; }
+/* Monograma da entrada: as letras aparecem, o raminho se abre e balança como numa brisa,
+   e a estrela acende e cintila de tempos em tempos */
+.entrada-logo { display: block; width: min(84vw, 460px, 62vh); height: auto; overflow: visible; }
+.lg-letras { fill: #93ab94; animation: lg-aparece 1.4s ease-out both; }
+.lg-ramo {
+  fill: #a9bca8; transform-box: fill-box; transform-origin: 99% 99%;   /* gira pela base do galho */
+  animation: lg-abre 1.8s cubic-bezier(.25, .8, .3, 1) .35s both, lg-brisa 6s ease-in-out 2.15s infinite;
+}
+.lg-estrela {
+  fill: #f1ead6; transform-box: fill-box; transform-origin: 50% 50%;
+  animation: lg-acende .9s cubic-bezier(.3, 1.5, .5, 1) 1.2s both, lg-cintila 3.8s ease-in-out 2.4s infinite;
+}
+.lg-brilho { transform-box: fill-box; transform-origin: 50% 50%; animation: lg-aparece 1s ease-out 1.3s both, lg-pulsa 3.8s ease-in-out 2.4s infinite; }
+@keyframes lg-aparece { from { opacity: 0; } to { opacity: 1; } }
+@keyframes lg-abre { from { opacity: 0; transform: rotate(-16deg) scale(.82); } to { opacity: 1; transform: none; } }
+@keyframes lg-brisa {
+  0%, 100% { transform: rotate(0deg); }
+  38% { transform: rotate(-3.2deg); }
+  70% { transform: rotate(1.1deg); }
+}
+@keyframes lg-acende { from { opacity: 0; transform: scale(0) rotate(-120deg); } to { opacity: 1; transform: none; } }
+@keyframes lg-cintila {
+  0%, 62%, 100% { transform: scale(1) rotate(0deg); opacity: .92; }
+  74% { transform: scale(1.5) rotate(24deg); opacity: 1; }
+  86% { transform: scale(.86) rotate(-6deg); opacity: .85; }
+}
+@keyframes lg-pulsa {
+  0%, 62%, 100% { opacity: .55; transform: scale(1); }
+  74% { opacity: 1; transform: scale(1.35); }
+}
+.entrada-nome { margin-top: 26px; font-size: clamp(20px, 3vh, 28px); letter-spacing: .28em; padding-left: .28em; text-transform: uppercase; }
 .entrada-aviso { margin-top: 14px; font-size: 16px; font-weight: 500; font-style: italic; color: #d4cfc0; }
 .entrada-botoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 30px; }
 
@@ -175,11 +198,12 @@ html.js #acoes { visibility: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .dica i { animation: none; }
   #entrada, .botao, .flutuante, .dica { transition: none; }
+  .entrada-logo * { animation: none !important; }
 }
 
-/* Computador: os três botões lado a lado (celular deitado fica com a grade acima) */
+/* Computador: os dois botões lado a lado (celular deitado fica com a grade acima) */
 @media (min-width: 760px) and (min-height: 521px) {
   .detalhes > .acoes { display: flex; flex-wrap: nowrap; justify-content: center; width: auto; }
-  .acoes .botao-linha-escura { padding: 0 18px; font-size: 15px; letter-spacing: .08em; }
+  .acoes .botao { padding: 0 22px; font-size: 15px; letter-spacing: .08em; }
   .botao { white-space: nowrap; }
 }

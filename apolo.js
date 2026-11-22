@@ -143,13 +143,14 @@ window.Apolo = (function () {
     return ordemFofocas.pop();
   }
 
-  var balaoAte = 0, bw = 0, bh = 0, timerBalao;
+  var balaoAte = 0, bw = 0, bh = 0, timerBalao, balaoLado = 0;
   function falar(texto, dur) {
     if (!elBalao || !texto) return;
     miolo.textContent = texto;
     elBalao.classList.add("visivel");
-    bw = elBalao.offsetWidth; bh = elBalao.offsetHeight;
-    balaoAte = agora() + (dur || lim(texto.length * .075, 2.6, 5));
+    medirBalao();
+    // Tempo de leitura: cerca de 11 letras por segundo, nunca menos de 4 s
+    balaoAte = agora() + (dur || lim(2 + texto.length * .09, 4, 7.5));
     posicionarBalao();
     clearTimeout(timerBalao);
     if (reduz) timerBalao = setTimeout(esconderBalao, (balaoAte - agora()) * 1000);
@@ -159,11 +160,43 @@ window.Apolo = (function () {
     var r = P.cabeca.getBoundingClientRect();
     return { x: r.left + r.width / 2, y: r.top };
   }
+  // Com um quadro aberto, onde sobra espaço para o balão: à esquerda do quadro
+  // (computador) ou na faixa livre embaixo dele (celular).
+  function vaga() {
+    if (!quadro || modo !== "presente") return null;
+    var q = quadro.getBoundingClientRect();
+    if (q.left > LARG + 40) return { dir: q.left - 12 };
+    return { topo: q.bottom + 6 };
+  }
+  function medirBalao() {
+    var g = vaga(), r = P.cabeca.getBoundingClientRect();
+    balaoLado = 0;
+    elBalao.classList.remove("lado", "lado-esq");
+    elBalao.style.maxWidth = g && g.dir ? Math.min(270, Math.max(150, g.dir - 10)) + "px" : "";
+    bw = elBalao.offsetWidth; bh = elBalao.offsetHeight;
+    if (g && g.topo && r.top - bh - 10 < g.topo) {
+      // Não cabe em cima da cabeça sem cobrir o quadro: vai para o lado da cabeça
+      balaoLado = W - r.right >= r.left ? 1 : -1;
+      elBalao.classList.add("lado");
+      if (balaoLado < 0) elBalao.classList.add("lado-esq");
+      var esp = balaoLado > 0 ? W - r.right - 24 : r.left - 24;
+      elBalao.style.maxWidth = Math.min(270, Math.max(140, esp)) + "px";
+      bw = elBalao.offsetWidth; bh = elBalao.offsetHeight;
+    }
+  }
   function posicionarBalao() {
-    var c = topoCabeca();
-    var bx = lim(c.x - bw / 2, 10, W - bw - 10), by = c.y - bh - 10;
+    var r = P.cabeca.getBoundingClientRect(), g = vaga(), bx, by;
+    if (balaoLado) {
+      var ay = r.top + r.height * .4;
+      bx = lim(balaoLado > 0 ? r.right + 12 : r.left - 12 - bw, 10, W - bw - 10);
+      by = lim(ay - bh / 2, g && g.topo ? g.topo : 10, window.innerHeight - bh - 8);
+      elBalao.style.setProperty("--seta", n(lim(ay - by, 14, bh - 14)) + "px");
+    } else {
+      var cx = r.left + r.width / 2, dir = g && g.dir ? g.dir : W - 10;
+      bx = lim(cx - bw / 2, 10, Math.max(10, dir - bw)); by = r.top - bh - 10;
+      elBalao.style.setProperty("--seta", n(lim(cx - bx, 18, bw - 18)) + "px");
+    }
     elBalao.style.transform = "translate3d(" + n(bx) + "px," + n(by) + "px,0)";
-    elBalao.style.setProperty("--seta", n(lim(c.x - bx, 18, bw - 18)) + "px");
   }
   function posicionarZzz() {
     var c = topoCabeca(), fs = face.x >= 0 ? 1 : -1;
@@ -204,7 +237,7 @@ window.Apolo = (function () {
   function reagir(T) {
     var it = itemAtual;
     if (!it || it.humor === "pano") return;
-    var pausa = (it.humor === "julga" || it.humor === "nega" || it.humor === "ressalva") ? .7 : .15;
+    var pausa = (it.humor === "julga" || it.humor === "nega" || it.humor === "ressalva") ? .6 : .25;
     falaPendente = { texto: it.fala, em: T + pausa };
     if (it.humor === "aprova") pular(360);
   }
@@ -213,10 +246,13 @@ window.Apolo = (function () {
   var PW = 40, PH = 26;
   function soltarPano(caixa, fala) {
     var r = caixa.getBoundingClientRect();
+    // Computador: escorrega pela borda esquerda do quadro e cai no chão livre,
+    // onde o Apolo come e fala sem ficar atrás do quadro.
+    var esquerda = r.left > LARG + 40 + PW;
     pano = {
-      fase: "caindo", fala: fala, t: agora(), lado: 0,
-      x: lim(r.left + r.width * .72 - PW / 2, 12, W - PW - 12), y: r.bottom - PH - 8,
-      vy: -160, rot: -10, vr: 150, esc: 1
+      fase: "caindo", fala: fala, t: agora(), lado: esquerda ? 1 : 0,
+      x: esquerda ? r.left - PW / 2 : lim(r.left + r.width * .72 - PW / 2, 12, W - PW - 12), y: r.bottom - PH - 8,
+      vx: esquerda ? -170 : 0, vy: -160, rot: -10, vr: 150, esc: 1
     };
     if (elPano) elPano.classList.add("visivel");
   }
@@ -224,7 +260,8 @@ window.Apolo = (function () {
     var s = pano, dt = dtAtual, piso = CHAO - 5 * U - PH, pcx = s.x + PW / 2;
     if (s.fase === "caindo") {
       s.vy += 1400 * dt; s.y += s.vy * dt; s.rot += s.vr * dt; s.vr *= Math.exp(-dt * 1.5);
-      s.x += Math.sin((T - s.t) * 6) * 30 * dt;   // balança no ar, como pano
+      s.x += (s.vx + Math.sin((T - s.t) * 6) * 30) * dt;   // balança no ar, como pano
+      s.vx *= Math.exp(-dt * 1.2); s.x = lim(s.x, 12, W - PW - 12);
       if (s.y >= piso) { s.y = piso; s.fase = "chao"; s.rot = 6; }
     }
     I.olhar = { x: pcx, y: s.y + PH / 2 }; I.orelha = 20; I.alegria = .9;
@@ -273,13 +310,15 @@ window.Apolo = (function () {
 
     if (modo === "presente" && quadro) {
       var q = quadro.getBoundingClientRect(), qcx = q.left + q.width / 2;
-      // Senta ao lado do quadro; se não houver espaço (celular), embaixo dele
-      alvoX = q.left > LARG + 30 ? q.left - LARG - 14 : lim(q.left + 4, 4, W - LARG - 4);
+      // Computador: vai para o meio do espaço livre à esquerda do quadro.
+      // Celular: senta embaixo do quadro, no canto esquerdo.
+      alvoX = q.left > LARG + 40 ? lim((q.left - LARG) / 2, 16, q.left - LARG - 14) : lim(q.left + 4, 4, W - LARG - 4);
       velMax = 600;
       I.olhar = { x: qcx, y: q.top + 50 };
       if (Math.abs(alvoX - x) < 8 && Math.abs(v) < 40) {
         I.sentar = 1;
-        if (!reagiu) { reagiu = true; reagir(T); }
+        // Só fala depois de chegar e sentar
+        if (!reagiu && sentado.x > .7) { reagiu = true; reagir(T); }
         humorNa(I, humorQuadro);
         if (humorQuadro === "nega" && T > falaPendenteEm()) {
           // "Não fui eu": vira de costas e olha para o outro lado
@@ -428,7 +467,7 @@ window.Apolo = (function () {
     });
 
     // Falas e balão
-    if (!saudou && T - inicio > 1.8) {
+    if (!saudou && modo === "livre" && T - inicio > 1.8) {
       saudou = true;
       falar(temCursor ? "Oi, eu sou o Apolo. Estou de olho nas suas escolhas." : "Oi, eu sou o Apolo. Pode me cutucar.");
     }
@@ -523,7 +562,7 @@ window.Apolo = (function () {
       alegria = 1; linguaAte = agora() + 2.4;
       pular(520);
       setTimeout(function () { pular(400); }, 820);
-      falar(texto, 3.6);
+      falar(texto);
     },
     // Copia o desenho, sentado e de língua de fora, para usar como retrato
     retrato: function (alvo, ajuste) {

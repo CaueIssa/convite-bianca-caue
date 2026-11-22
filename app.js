@@ -1,8 +1,7 @@
-/* História na rolagem, entrada, som e compartilhamento */
+/* História na rolagem, entrada e som */
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var movimentoReduzido = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var IMAGEM = "convite-final.jpg", NOME_ARQUIVO = "convite-bianca-caue.jpg";
 
   var mono = $("mono"), letraB = mono.querySelector(".b"), letraC = mono.querySelector(".c");
   var nome = $("nome"), frase = $("frase"), dica = $("dica"), pular = $("pular"), botaoSom = $("som");
@@ -15,8 +14,7 @@
     { el: nome, a0: .34, a1: .40, b0: .44, b1: .50, kMax: 1.18 },
     { el: $("texto"), a0: .50, a1: .55, b0: .59, b1: .64, kMax: 1.25 },
     { el: $("data"), a0: .64, a1: .69, b0: .73, b1: .77, kMax: 1.35 },
-    { el: $("local"), a0: .77, a1: .82, b0: 0, b1: 0, kMax: 1 },
-    { el: $("almoco"), a0: .81, a1: .86, b0: 0, b1: 0, kMax: 1 },
+    { el: $("local"), a0: .78, a1: .84, b0: 0, b1: 0, kMax: 1 },
     { el: acoes, a0: .88, a1: .94, b0: 0, b1: 0, kMax: 1 }
   ];
   var monoOrigem = { dx: 0, dy: 0 };
@@ -121,7 +119,7 @@
     document.body.classList.add("dentro");
     $("entrada").classList.add("saindo");
     setTimeout(function () { $("entrada").style.display = "none"; }, movimentoReduzido ? 0 : 950);
-    if (movimentoReduzido) { $("compartilhar").focus({ preventScroll: true }); return; }
+    if (movimentoReduzido) { $("presentes").focus({ preventScroll: true }); return; }
     botaoSom.focus({ preventScroll: true });
   }
   $("entrar-som").addEventListener("click", function () { entrar(true); });
@@ -133,33 +131,7 @@
   pular.addEventListener("click", function () {
     window.scrollTo(0, document.documentElement.scrollHeight);
     acoes.style.visibility = "visible";
-    $("compartilhar").focus({ preventScroll: true });
-  });
-
-  // Compartilhar: imagem e link quando o aparelho permite; senão, link e prévia
-  var arquivo = null;
-  function preparar() {
-    if (arquivo || !window.fetch || !window.File) return;
-    fetch(IMAGEM).then(function (r) { if (!r.ok) throw 0; return r.blob(); }).then(function (b) {
-      arquivo = new File([b], NOME_ARQUIVO, { type: "image/jpeg" });
-    }).catch(function () {});
-  }
-  function enderecoDaPagina() { return location.origin + location.pathname; }
-  function abrirWhatsApp(msg) {
-    window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank", "noopener");
-  }
-  $("compartilhar").addEventListener("click", function () {
-    var link = enderecoDaPagina();
-    var msg = "Oi! Chegou um dia que a gente queria muito dividir com você: vamos nos casar, e seria uma alegria ter você com a gente em 02/12.\n\n" +
-      "Preparamos este convite com muito carinho. Abre com o som ligado:\n" + link + "\n\nUm beijo,\nBianca e Cauê";
-    if (arquivo && navigator.canShare && navigator.canShare({ files: [arquivo] })) {
-      navigator.share({ files: [arquivo], text: msg }).catch(function (e) {
-        if (e && e.name === "AbortError") return;
-        abrirWhatsApp(msg);
-      });
-      return;
-    }
-    abrirWhatsApp(msg);
+    $("presentes").focus({ preventScroll: true });
   });
 
   // Tamanho da tela: barra de endereço do celular não deve redesenhar tudo
@@ -175,7 +147,6 @@
   if ("scrollRestoration" in history) history.scrollRestoration = "manual";
   document.body.classList.add("travado");
   window.scrollTo(0, 0);
-  preparar();
 
   function comecar() {
     medirBlocos();

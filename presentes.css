@@ -58,31 +58,23 @@ a { color: inherit; }
 .voltar::before { content: "\2190"; text-decoration: none; display: inline-block; transition: transform .3s var(--curva); }
 .voltar:hover::before { transform: translateX(-3px); }
 
-/* ---------- Cabeçalho: o monograma do convite atrás do título ---------- */
+/* ---------- Cabeçalho: o monograma do casal acima do título ---------- */
 .topo { position: relative; max-width: 720px; margin: 10px auto 0; text-align: center; }
-.ramo {
-  position: absolute; z-index: 0; left: -96px; top: -40px; height: 520px; aspect-ratio: 250 / 1080;
-  opacity: 0; transition: opacity 1.4s ease;
-}
-.ramo.pronto { opacity: 1; }
+.monograma { position: relative; z-index: 1; display: block; width: min(370px, 82%); height: auto; margin: 4px auto 0; overflow: visible; }
+.monograma .mg-ramo { fill: #7d9a80; }
+.monograma .mg-letras { fill: var(--salvia); }
+.monograma .mg-estrela { fill: #7d9a80; }
 .casal {
-  position: relative; z-index: 1;
+  position: relative; z-index: 1; margin-top: 18px;
   font-size: 14px; font-weight: 700; letter-spacing: .32em; padding-left: .32em; text-transform: uppercase;
 }
-.titulo { position: relative; z-index: 1; margin-top: 18px; padding: 54px 0 46px; }
-.mono {
-  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -54%);
-  font-size: clamp(170px, 30vw, 270px); line-height: .8; font-weight: 300; font-style: italic;
-  color: var(--salvia-clara); opacity: .5; white-space: nowrap; pointer-events: none;
-}
-.mono .c { margin-left: -.12em; position: relative; top: .14em; }
-.titulo h1 {
-  position: relative; font-size: clamp(46px, 8.2vw, 84px); line-height: 1; font-weight: 500; font-style: italic;
+.topo h1 {
+  position: relative; z-index: 1; margin-top: 14px;
+  font-size: clamp(44px, 7.6vw, 76px); line-height: 1.02; font-weight: 500; font-style: italic;
   letter-spacing: -.01em;
-  text-shadow: 0 0 8px var(--papel), 0 0 18px var(--papel), 0 0 30px var(--papel);
 }
 .data {
-  position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 14px;
+  position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 16px;
   font-family: "Bodoni Moda", Georgia, serif; font-size: 17px; letter-spacing: .14em; color: var(--tinta-suave);
 }
 .data i { display: block; width: 22px; height: 1px; background: var(--salvia-clara); }
@@ -91,54 +83,42 @@ a { color: inherit; }
   font-size: 21px; line-height: 1.5; text-wrap: pretty;
 }
 
-/* ---------- Nota do curador ---------- */
-.curadoria {
-  display: grid; grid-template-columns: 190px 1fr; align-items: center; gap: 40px;
-  max-width: 620px; margin: 64px auto 0;
+/* ---------- Um recado nosso: foto do casal e o texto ---------- */
+.recado {
+  display: grid; grid-template-columns: 220px 1fr; align-items: center; gap: 44px;
+  max-width: 680px; margin: 64px auto 0;
 }
 .moldura {
   position: relative; aspect-ratio: 4 / 5; overflow: hidden;
-  border-radius: 999px 999px 4px 4px;
-  background:
-    radial-gradient(90% 60% at 30% 18%, rgba(255, 255, 255, .7), transparent 70%),
-    radial-gradient(130% 90% at 50% 100%, #d9e3d3, #ecf0e4 72%);
-  box-shadow: inset 0 0 0 1px rgba(92, 122, 96, .22), inset 0 0 0 7px var(--papel), inset 0 0 0 8px rgba(92, 122, 96, .18);
+  border-radius: 999px 999px 4px 4px; background: #ecf0e4;
+  box-shadow: 0 18px 36px -24px rgba(38, 40, 36, .45);
 }
-.moldura::after {   /* luz de janela atravessando o retrato */
-  content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: repeating-linear-gradient(118deg, transparent 0 34px, rgba(255, 250, 235, .35) 34px 52px, transparent 52px 86px);
-  mix-blend-mode: soft-light;
+.moldura::after {   /* filete de papelaria por dentro do arco */
+  content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(92, 122, 96, .25), inset 0 0 0 7px rgba(251, 248, 239, .55), inset 0 0 0 8px rgba(92, 122, 96, .2);
 }
-.moldura svg { position: absolute; left: 4%; bottom: 4%; width: 92%; height: auto; overflow: visible; }
-.moldura .a-coleira { stroke: var(--salvia); }
-.moldura .a-sombra { fill: rgba(38, 40, 36, .12); }
-.moldura img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.moldura img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; }
 
 .nota { text-align: left; }
 .nota-rotulo { font-size: 13px; font-weight: 700; letter-spacing: .24em; text-transform: uppercase; color: var(--salvia); }
-.nota-texto { margin-top: 10px; font-size: 22px; line-height: 1.42; font-style: italic; text-wrap: pretty; }
+.nota-texto {
+  position: relative; margin-top: 12px; font-size: 21px; line-height: 1.48; font-style: italic; text-wrap: pretty;
+}
+.nota-texto::before {   /* aspas grandes, em Bodoni, no canto */
+  content: "\201C"; position: absolute; left: -.42em; top: -.32em;
+  font-family: "Cormorant Garamond", Georgia, serif; font-style: normal; font-weight: 600; font-size: 3.2em; line-height: 1; color: var(--salvia-clara);
+}
+.nota-texto::after { content: "\201D"; }
 .assinatura {
-  display: flex; align-items: center; gap: 8px; margin-top: 12px;
-  font-size: 26px; font-style: italic; font-weight: 600; color: var(--salvia-escura);
+  display: flex; align-items: center; gap: 10px; margin-top: 14px;
+  font-size: 25px; font-style: italic; font-weight: 600; color: var(--salvia-escura);
 }
 .assinatura::before { content: ""; width: 26px; height: 1px; background: var(--salvia-clara); }
-.assinatura::after { content: ""; width: 18px; height: 18px; background: var(--pata) center / contain no-repeat; transform: rotate(-14deg); opacity: .85; }
 .nota-dica { margin-top: 18px; font-size: 13px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--tinta-clara); }
 
-/* ---------- O cardápio ---------- */
-.cardapio { position: relative; max-width: var(--coluna); margin: 72px auto 0; }
-.secao + .secao { margin-top: 64px; }
-.secao-titulo { text-align: center; }
-.secao-nome {
-  display: flex; align-items: center; justify-content: center; gap: 16px;
-  font-size: 32px; line-height: 1.1; font-weight: 500; font-style: italic;
-}
-.secao-nome::before, .secao-nome::after {
-  content: ""; width: 60px; height: 20px; flex: none; background: var(--ramo-folha) center / contain no-repeat;
-}
-.secao-nome::before { transform: scaleX(-1); }
-.secao-faixa { margin-top: 6px; font-size: 12.5px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; color: var(--tinta-clara); }
-.itens { list-style: none; margin-top: 18px; border-top: 1px solid var(--fio); }
+/* ---------- A lista: uma coluna, em ordem de valor ---------- */
+.lista { position: relative; max-width: var(--coluna); margin: 72px auto 0; }
+.itens { list-style: none; border-top: 1px solid var(--fio); }
 .itens > li { position: relative; border-bottom: 1px solid var(--fio); }
 
 .item {
@@ -187,7 +167,7 @@ a { color: inherit; }
 }
 
 /* Entrada: linhas sobem em sequência; o carimbo "bate" no papel */
-html.js .secao-titulo, html.js .itens > li { opacity: 0; transform: translateY(14px); transition: opacity .7s ease, transform .9s var(--curva); transition-delay: var(--atraso, 0ms); }
+html.js .itens > li { opacity: 0; transform: translateY(14px); transition: opacity .7s ease, transform .9s var(--curva); transition-delay: var(--atraso, 0ms); }
 html.js .visto { opacity: 1 !important; transform: none !important; }
 html.js .itens > li .carimbo svg { opacity: 0; }
 html.js .itens > li.visto .carimbo svg { animation: carimbar .55s cubic-bezier(.3, 1.4, .5, 1) both; animation-delay: calc(var(--atraso, 0ms) + 380ms); }
@@ -253,8 +233,8 @@ html.js .itens > li.visto .carimbo svg { animation: carimbar .55s cubic-bezier(.
 }
 .apolo-toque:focus-visible { outline: 2px dashed var(--salvia); outline-offset: 4px; }
 
-.balao {
-  position: fixed; left: 0; top: 0; z-index: 46; pointer-events: none;
+.balao {   /* acima do quadro do presente (50): a fala nunca fica escondida */
+  position: fixed; left: 0; top: 0; z-index: 55; pointer-events: none;
   max-width: min(270px, calc(100vw - 20px)); will-change: transform;
 }
 .balao-miolo {
@@ -271,6 +251,18 @@ html.js .itens > li.visto .carimbo svg { animation: carimbar .55s cubic-bezier(.
   transform: rotate(45deg);
 }
 .balao.visivel .balao-miolo { opacity: 1; transform: none; }
+/* Celular, com o quadro aberto: o balão fica ao lado da cabeça, na faixa embaixo do quadro */
+.balao.lado .balao-miolo { padding: 8px 13px 9px; font-size: 16.5px; transform: translateX(-6px) scale(.9); transform-origin: 0 var(--seta, 50%); }
+.balao.lado-esq .balao-miolo { transform: translateX(6px) scale(.9); transform-origin: 100% var(--seta, 50%); }
+.balao.lado.visivel .balao-miolo { transform: none; }
+.balao.lado .balao-miolo::after {
+  left: -7px; top: var(--seta, 50%); bottom: auto; margin: -6px 0 0;
+  border: 0; border-left: 1px solid var(--fio); border-bottom: 1px solid var(--fio);
+}
+.balao.lado-esq .balao-miolo::after {
+  left: auto; right: -7px;
+  border: 0; border-top: 1px solid var(--fio); border-right: 1px solid var(--fio);
+}
 
 .zzz {
   position: fixed; left: 0; top: 0; z-index: 46; pointer-events: none;
@@ -367,24 +359,43 @@ html.js .itens > li.visto .carimbo svg { animation: carimbar .55s cubic-bezier(.
 .pix-chave .link { min-height: 0; padding: 6px 4px; font-size: 15px; }
 .modal-voltar { margin-top: 8px; font-size: 16px; }
 
-/* ---------- Telas estreitas ---------- */
-@media (max-width: 760px) {
-  .ramo { left: -46px; top: 14px; height: 360px; }
+/* Computador: o quadro vira um cartão largo, em duas colunas (presente | Pix),
+   deslocado para a direita para o Apolo ficar à vista do lado esquerdo, e baixo o
+   bastante para caber na tela sem barra de rolagem. */
+@media (min-width: 900px) and (hover: hover) {
+  .modal { justify-content: flex-end; padding: 24px max(28px, 6vw) 24px 200px; }
+  .modal-caixa {
+    width: min(760px, 100%); display: grid; grid-template-columns: minmax(0, 1fr) 248px; column-gap: 34px;
+    align-items: start; align-content: center; padding: 42px 38px 30px; text-align: left;
+  }
+  .modal-caixa > * { grid-column: 1; }
+  .modal-caixa > .pix, .modal-caixa > .pix-embreve {
+    grid-column: 2; grid-row: 1 / span 6; align-self: center;
+    margin: 0; padding: 0 0 0 34px; border-top: 0; border-left: 1px solid var(--fio); text-align: center;
+  }
+  .pix-embreve { border: 0; }
+  .pix-qr { width: 168px; margin-bottom: 14px; }
+  .pix .botao-verde { padding: 0 12px; font-size: 14px; letter-spacing: .08em; white-space: nowrap; }
+  .pix-ajuda { font-size: 15px; }
+  .com-selo .modal-rotulo, .com-selo h2 { padding-left: 70px; padding-right: 0; }
+  .modal-caixa h2 { margin-top: 8px; }
+  .modal-valor { margin-top: 14px; font-size: 52px; }
+  .modal-desc { margin-top: 10px; }
+  .modal-voltar { justify-self: start; margin: 14px 0 0 -6px; }
 }
+
+/* ---------- Telas estreitas ---------- */
 @media (max-width: 600px) {
   .pagina { padding-left: 18px; padding-right: 18px; }
-  .ramo { left: -30px; top: -8px; height: 220px; opacity: 0; }   /* só ao lado do título, longe do texto */
-  .ramo.pronto { opacity: .9; }
-  .titulo { padding: 44px 0 36px; }
+  .monograma { width: min(280px, 80%); }
   .abertura { font-size: 19.5px; }
-  .curadoria { grid-template-columns: 1fr; justify-items: center; gap: 22px; margin-top: 48px; }
-  .retrato { width: 168px; }
+  .recado { grid-template-columns: 1fr; justify-items: center; gap: 26px; margin-top: 50px; }
+  .retrato { width: 200px; }
   .nota { text-align: center; }
+  .nota-texto { font-size: 19.5px; padding-top: 18px; }
+  .nota-texto::before { left: 50%; top: -.42em; transform: translateX(-50%); font-size: 2.6em; }
   .assinatura { justify-content: center; }
-  .nota-texto { font-size: 20.5px; }
-  .cardapio { margin-top: 58px; }
-  .secao-nome { font-size: 28px; gap: 10px; }
-  .secao-nome::before, .secao-nome::after { width: 44px; }
+  .lista { margin-top: 58px; }
   .item { grid-template-columns: 2em 1fr auto; column-gap: 8px; padding: 20px 2px 18px 0; }
   .item-nome-texto { font-size: 15px; letter-spacing: .09em; }
   .item-preco { font-size: 21px; }
@@ -395,8 +406,8 @@ html.js .itens > li.visto .carimbo svg { animation: carimbar .55s cubic-bezier(.
 
 @media (prefers-reduced-motion: reduce) {
   .sombras, .musica.tocando .musica-icone i { animation: none; }
-  html.js .secao-titulo, html.js .itens > li { opacity: 1; transform: none; transition: none; }
+  html.js .itens > li { opacity: 1; transform: none; transition: none; }
   html.js .itens > li .carimbo svg { opacity: .88; animation: none !important; }
-  .modal-caixa, .modal-fundo, .balao-miolo, .botao, .item::before, .ramo { transition: none; }
+  .modal-caixa, .modal-fundo, .balao-miolo, .botao, .item::before { transition: none; }
   .modal.aberto .modal-carimbo svg { animation: none; }
 }

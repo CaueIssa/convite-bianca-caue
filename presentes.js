@@ -16,8 +16,9 @@
   };
 
   /* ============== PRESENTES ==============
-     valor:   0 = valor livre. A ordem do cardápio segue a ordem desta lista.
-     carimbo: parecer do Apolo, em duas linhas [em cima, embaixo] do selo redondo.
+     A lista aparece em ordem de valor, do menor para o maior (o valor livre fica por último).
+     valor:   0 = valor livre.
+     carimbo: parecer do Apolo, em duas linhas [em cima, embaixo] do selo redondo (opcional).
      tinta:   cor do carimbo: "verde", "terra" ou "grafite".
      humor:   como o Apolo reage ao quadro aberto
               aprova | julga | nega | ressalva | fofoca | neutro | pano
@@ -27,29 +28,29 @@
       carimbo: ["Aprovado", "pelo Apolo"], tinta: "verde", humor: "pano", fala: "Que pano?" },
     { nome: "Rolo tira-pelos industrial", desc: "O Apolo vai ao almoço. Considere isto um pedido de desculpas antecipado.", valor: 45,
       carimbo: ["Apolo não", "vê problema"], tinta: "grafite", humor: "neutro", fala: "Que pelo?" },
-    { nome: "Bolinha indestrutível", desc: "Testada em laboratório. Ainda não testada no Apolo.", valor: 60,
-      carimbo: ["Aprovado", "pelo Apolo"], tinta: "verde", humor: "aprova", fala: "Aceito o desafio." },
-    { nome: "Petiscos para negociação", desc: "Moeda oficial da casa. Câmbio atual: um petisco por pano de chão devolvido inteiro.", valor: 80,
-      carimbo: ["Aprovado", "pelo Apolo"], tinta: "verde", humor: "aprova", fala: "Agora a gente está negociando." },
-    { nome: "Silêncio do Apolo", desc: "Ele é fofoqueiro. Este valor garante que o que ele ouvir no almoço fica no almoço.", valor: 150,
-      carimbo: ["Apolo não", "garante nada"], tinta: "grafite", humor: "fofoca", fala: "Não prometo nada." },
-    { nome: "Presente com a data", desc: "O valor é 02/12/26. A gente não resistiu.", valor: 212.26,
+    { nome: "Fundo emergencial para TPM", desc: "Chocolate, delivery e paciência extra, liberados sem perguntas.", valor: 120,
+      humor: "neutro", fala: "Desse fundo eu não comento nada." },
+    { nome: "Massagem relaxante para o Cauê", desc: "Para depois de ele ver a conta do casamento. Spoiler: ele ainda não viu.", valor: 180,
+      humor: "fofoca", fala: "Eu já vi a conta. Vai precisar de duas." },
+    { nome: "Presente com a data", desc: "O valor é 02/12/26: a data eternizada no comprovante.", valor: 212.26,
       humor: "neutro", fala: "Essa foi ideia do Cauê." },
     { nome: "Primeiro jantar de casados", desc: "Em Milagres, pé na areia, sem ninguém lavando a louça.", valor: 250,
       humor: "ressalva", fala: "E eu janto onde?" },
-    { nome: "Faculdade do primeiro filho", desc: "Para quem pergunta sobre filho e quer ajudar com a faculdade. (A Bianca nem está grávida.)", valor: 250,
-      carimbo: ["Apolo é", "contra"], tinta: "terra", humor: "julga", fala: "Filho único está ótimo, obrigado." },
+    { nome: "Faculdade do primeiro filho", desc: "Enquanto o filho não chega, que tal já ir ajudando na faculdade dele?", valor: 250,
+      carimbo: ["Apolo quer", "um irmãozinho"], tinta: "verde", humor: "aprova", fala: "Quero um irmãozinho humano pra brincar." },
     { nome: "Um mês de ração", desc: "O Apolo pediu para colocar este no topo da lista.", valor: 290,
       carimbo: ["Sugerido", "pelo Apolo"], tinta: "verde", humor: "aprova", fala: "Ótima escolha. Fui eu que sugeri." },
-    { nome: "Camisa nova do Botafogo", desc: "A antiga virou pano de chão. Vocês já sabem o que aconteceu com o pano.", valor: 350,
-      carimbo: ["Apolo", "nega tudo"], tinta: "terra", humor: "nega", fala: "Não fui eu." },
-    { nome: "Hotelzinho na lua de mel", desc: "Alguém precisa cuidar dele enquanto a gente finge que não está com saudade.", valor: 380,
-      carimbo: ["Apolo tem", "ressalvas"], tinta: "grafite", humor: "ressalva", fala: "Vou pensar no seu caso." },
-    { nome: "Upgrade na lua de mel", desc: "O Cauê planeja viagens esportivas o ano inteiro. Nesta, o único esporte é a rede.", valor: 500,
-      humor: "neutro", fala: "Rede eu também curto." },
+    { nome: "Academia para os noivos", desc: "Para a volta da lua de mel, porque lá ninguém vai contar caloria.", valor: 300,
+      humor: "neutro", fala: "Eu já corro atrás do pano todo dia." },
+    { nome: "Upgrade na lua de mel", desc: "Um incentivo para as abelhas trabalharem dobrado e caprichar no mel dessa lua.", valor: 500,
+      humor: "neutro", fala: "Traz um potinho de mel pra mim?" },
     { nome: "Valor livre", desc: "Para quem pulou a lista inteira e só quer fazer o Pix. Respeitamos.", valor: 0,
       humor: "julga", fala: "Pulou a lista inteira, né? Eu vi." }
   ];
+  // Do menor para o maior; valor livre no fim (empates mantêm a ordem acima)
+  PRESENTES = PRESENTES.map(function (p, i) { p.ordem = i; return p; }).sort(function (a, b) {
+    return ((a.valor || Infinity) - (b.valor || Infinity)) || (a.ordem - b.ordem);
+  });
 
   var $ = function (id) { return document.getElementById(id); };
   var Apolo = window.Apolo;
@@ -106,38 +107,19 @@
   var GIROS = [-9, 7, -4, 11, -12, 5, -7, 9, -3, 12, -10, 6];
   var SETA = '<svg viewBox="0 0 22 10" width="22" height="10" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" aria-hidden="true"><path d="M1 5h19M16 1.5l4 3.5-4 3.5"/></svg>';
 
-  /* ---------- Cardápio: seções pela faixa de valor ---------- */
-  var SECOES = [
-    { nome: "Entradas", cabe: function (v) { return v > 0 && v <= 100; } },
-    { nome: "Pratos principais", cabe: function (v) { return v > 100 && v <= 300; } },
-    { nome: "Sobremesas", cabe: function (v) { return v > 300; } },
-    { nome: "Fora do cardápio", cabe: function (v) { return !v; }, faixa: "o valor é com você" }
-  ];
+  /* ---------- Lista: uma coluna só, em ordem de valor ---------- */
   var temCursor = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   $("dica").textContent = temCursor ? "Clique num presente para ver o Pix" : "Toque num presente para ver o Pix";
 
-  var cardapio = $("cardapio"), numero = 0, observados = [];
-  var comValor = SECOES.filter(function (s) { return !s.faixa; });
-  SECOES.forEach(function (s) {
-    var itens = PRESENTES.filter(function (p) { return s.cabe(p.valor); });
-    if (!itens.length) return;
-    if (!s.faixa) {
-      var vals = itens.map(function (p) { return p.valor; });
-      var min = Math.min.apply(null, vals), max = Math.max.apply(null, vals);
-      var i = comValor.indexOf(s);
-      s.faixa = i === 0 ? "até " + reais(max) : i === comValor.length - 1 ? "a partir de " + reais(min) : "de " + reais(min) + " a " + reais(max);
-    }
-    var sec = document.createElement("section");
-    sec.className = "secao";
-    sec.innerHTML = '<header class="secao-titulo"><h2 class="secao-nome"></h2><p class="secao-faixa"></p></header><ul class="itens"></ul>';
-    sec.querySelector(".secao-nome").textContent = s.nome;
-    sec.querySelector(".secao-faixa").textContent = s.faixa;
-    observados.push(sec.querySelector(".secao-titulo"));
-    var ul = sec.querySelector(".itens");
-
+  var lista = $("lista"), numero = 0, observados = [];
+  var ul = document.createElement("ul");
+  ul.className = "itens";
+  lista.appendChild(ul);
+  (function () {
+    var itens = PRESENTES;
     itens.forEach(function (p) {
       numero++;
-      p.num = (numero < 10 ? "0" : "") + numero; p.secao = s.nome; p.giro = GIROS[(numero - 1) % GIROS.length];
+      p.num = (numero < 10 ? "0" : "") + numero; p.giro = GIROS[(numero - 1) % GIROS.length];
       var li = document.createElement("li");
       var b = document.createElement("button");
       b.type = "button"; b.className = "item"; b.setAttribute("aria-haspopup", "dialog");
@@ -169,8 +151,7 @@
       ul.appendChild(li);
       observados.push(li);
     });
-    cardapio.appendChild(sec);
-  });
+  })();
 
   // Linhas aparecem em sequência conforme entram na tela
   if ("IntersectionObserver" in window) {
@@ -186,24 +167,17 @@
     observados.forEach(function (el) { el.classList.add("visto"); });
   }
 
-  /* ---------- Retrato: foto do Apolo quando existir; até lá, o desenho ---------- */
-  var moldura = $("moldura");
-  Apolo.retrato(moldura);
-  var foto = new Image();
-  foto.alt = "O Apolo, nosso golden retriever";
-  foto.onload = function () { moldura.appendChild(foto); };
-  foto.src = "apolo.jpg";
-
   /* ---------- Quadro do presente ---------- */
   var fundo = $("modal-fundo"), modal = $("presente"), caixa = modal.querySelector(".modal-caixa");
   var copiar = $("m-copiar"), copiarChave = $("m-copiar-chave"), qrBox = $("m-qr"), campoCodigo = $("m-codigo");
   var atual = null, origem = null, codigo = "", timerFechar, timerBotao;
-  var computador = function () { return window.matchMedia("(min-width: 700px) and (hover: hover)").matches; };
+  // Computador com tela larga: quadro em duas colunas, ao lado do Apolo, com QR Code
+  var computador = function () { return window.matchMedia("(min-width: 900px) and (hover: hover)").matches; };
 
   var seloModal = $("m-carimbo");
   function abrir(p, botao) {
     atual = p; origem = botao;
-    $("m-rotulo").textContent = "Nº " + p.num + " · " + p.secao;
+    $("m-rotulo").textContent = "Presente nº " + p.num;
     seloModal.innerHTML = p.carimbo ? carimboSVG(p.carimbo) : "";
     seloModal.className = "modal-carimbo " + (p.tinta || "verde");
     seloModal.style.setProperty("--giro", (p.giro || -8) + "deg");

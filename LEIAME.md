@@ -4,9 +4,22 @@ Site estático, sem instalação e sem etapa de build.
 
 Publicado em https://caueissa.github.io/convite-bianca-caue/
 
+## O convite
+
+O convite é só para o almoço: quarta-feira, 02/12/2026, às 13h30, no Salão de Festa Hype
+(Rua Cesar Lattes, 260). Os textos ficam em `index.html`. No fim, dois botões: "Lista de
+presentes" e "Baixar imagem".
+
+A tela de entrada mostra o monograma do casal (o mesmo da lista de presentes, em SVG dentro
+de `index.html`): o raminho balança como numa brisa e a estrela cintila. As cores e a
+animação ficam em `estilo.css` (`.lg-letras`, `.lg-ramo`, `.lg-estrela`). Quem usa "reduzir
+movimento" vê o monograma parado.
+
 ## Trocar o convite em imagem
 
-Substitua `convite-final.jpg` mantendo o mesmo nome.
+Substitua `convite-final.jpg` mantendo o mesmo nome. É a imagem do botão "Baixar imagem" e
+da prévia do link no WhatsApp. Ao trocar, aumente o número em `convite-final.jpg?v=2` no
+`og:image` de `index.html` para o WhatsApp buscar a prévia nova.
 
 ## Lista de presentes
 
@@ -27,34 +40,35 @@ Antes de divulgar, teste: abra um presente, copie o código, cole no app do banc
 ### Editar os presentes
 
 Lista `PRESENTES` em `presentes.js`. Cada item tem nome, descrição, valor (`0` = valor livre),
-carimbo do Apolo em duas linhas (`["Aprovado", "pelo Apolo"]`: em cima e embaixo do selo),
-cor do carimbo (`"verde"`, `"terra"` ou `"grafite"`), humor (como o Apolo reage: `aprova`,
-`julga`, `nega`, `ressalva`, `fofoca`, `neutro` ou `pano`) e a fala dele.
+humor (como o Apolo reage: `aprova`, `julga`, `nega`, `ressalva`, `fofoca`, `neutro` ou `pano`)
+e a fala dele. Opcionalmente, um carimbo do Apolo em duas linhas (`["Aprovado", "pelo Apolo"]`:
+em cima e embaixo do selo) e a cor do carimbo (`"verde"`, `"terra"` ou `"grafite"`).
 
-A lista aparece como um cardápio, separada pelo valor: Entradas (até R$ 100), Pratos principais
-(até R$ 300), Sobremesas (acima disso) e Fora do cardápio (valor livre). As faixas de cada seção
-são calculadas sozinhas a partir dos valores.
+A lista aparece numa coluna só, sempre do menor valor para o maior, com o valor livre no fim.
+A ordem é feita sozinha; não importa em que ordem os itens estão no arquivo.
 
-### Foto do Apolo
+### Foto do casal
 
-Coloque a foto na pasta com o nome `apolo.jpg` (em pé, proporção 4:5 fica melhor).
-Enquanto ela não existir, o retrato mostra o desenho do Apolo.
+O retrato em arco, ao lado do recado, usa `casal.jpg` (proporção 4:5). Para trocar,
+substitua o arquivo mantendo o nome. O texto do recado fica em `presentes.html`.
 
-### O ramo do cabeçalho
+### Monograma
 
-`ramo.js` desenha o mesmo ramo de eucalipto em aquarela do convite (mesmas folhas de
-`cenario.js`), parado, uma única vez.
+O monograma do cabeçalho (raminho, arco com o B, C com cauda e estrelinha) foi contornado
+em vetor a partir do monograma original do casal. Fica em SVG dentro de `presentes.html`; as
+cores vêm de `presentes.css` (`.mg-ramo`, `.mg-letras` e `.mg-estrela`).
 
 ### O Apolo
 
 `apolo.js` desenha e anima o Apolo que anda pelo chão da página de presentes.
 No computador ele segue o cursor; no celular corre até onde a pessoa toca e,
-tocado, pula e conta uma fofoca. Ele reage a cada presente aberto e comemora quando
-alguém copia o Pix. Quem usa "reduzir movimento" no aparelho vê o Apolo parado.
+tocado, pula e conta uma fofoca. Quando um presente é aberto, ele vai até o espaço livre
+ao lado do quadro, senta e só então comenta; o balão fica na frente do quadro, com tempo
+para ler. Ele também comemora quando alguém copia o Pix. Quem usa "reduzir movimento" no aparelho vê o Apolo parado.
 
 ### Música da lista
 
-`musica.js` toca uma música alegre composta para a página (ukulele, glockenspiel,
-kalimba, baixinho e chocalho, em Fá maior), gerada pelo navegador, sem arquivo de áudio.
+`musica.js` toca uma música alegre composta para a página (ukulele de nylon, piano macio,
+marimba, baixinho e chocalho, em Fá maior), gerada pelo navegador, sem arquivo de áudio.
 Ela começa pelo botão "Música" no canto da página. Quem entrou no convite com som ouve
 a música no primeiro toque na lista. Com a música tocando, o Apolo balança a cabeça no ritmo.

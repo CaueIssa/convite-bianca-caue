@@ -49,21 +49,29 @@ window.Som = (function () {
     prox();
   }
 
+  // Passarinho ao longe: trinado (a nota treme depressa, como canto de verdade), baixinho
+  // e abafado. Onda pura sem trinado soava como bipe de aparelho.
   function passaro(saida) {
-    var t = ctx.currentTime + .05, base = 2300 + Math.random() * 1500, notas = 2 + (Math.random() * 4 | 0);
+    var t = ctx.currentTime + .05, base = 1900 + Math.random() * 900, notas = 2 + (Math.random() * 3 | 0);
     var pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
-    if (pan) { pan.pan.value = Math.random() * 1.4 - .7; pan.connect(saida); }
+    var abafa = ctx.createBiquadFilter(); abafa.type = "lowpass"; abafa.frequency.value = 3600; abafa.Q.value = .3;
+    abafa.connect(saida);
+    if (pan) { pan.pan.value = Math.random() * 1.2 - .6; pan.connect(abafa); }
     for (var i = 0; i < notas; i++) {
-      var o = ctx.createOscillator(), g = ctx.createGain(), d = .07 + Math.random() * .1;
+      var o = ctx.createOscillator(), g = ctx.createGain(), d = .09 + Math.random() * .12;
+      var trinado = ctx.createOscillator(), fundo = ctx.createGain();
       o.type = "sine";
-      o.frequency.setValueAtTime(base * (1 + Math.random() * .1), t);
-      o.frequency.exponentialRampToValueAtTime(base * (.82 + Math.random() * .5), t + d);
+      o.frequency.setValueAtTime(base * (1 + Math.random() * .08), t);
+      o.frequency.exponentialRampToValueAtTime(base * (.88 + Math.random() * .3), t + d);
+      trinado.frequency.value = 26 + Math.random() * 14;
+      fundo.gain.value = base * (.035 + Math.random() * .03);
+      trinado.connect(fundo); fundo.connect(o.frequency);
       g.gain.setValueAtTime(.0001, t);
-      g.gain.exponentialRampToValueAtTime(.022, t + d * .3);
+      g.gain.exponentialRampToValueAtTime(.011, t + d * .35);
       g.gain.exponentialRampToValueAtTime(.0001, t + d);
-      o.connect(g); g.connect(pan || saida);
-      o.start(t); o.stop(t + d + .02);
-      t += d + .03 + Math.random() * .1;
+      o.connect(g); g.connect(pan || abafa);
+      o.start(t); trinado.start(t); o.stop(t + d + .03); trinado.stop(t + d + .03);
+      t += d + .05 + Math.random() * .12;
     }
   }
 
@@ -121,8 +129,7 @@ window.Som = (function () {
 
     var gPass = ctx.createGain(); gPass.gain.value = .75;
     gPass.connect(mestre); gPass.connect(rev);
-    repetir(function () { passaro(gPass); }, 5, 15);
-    timers.push(setTimeout(function () { passaro(gPass); }, 2500));
+    repetir(function () { passaro(gPass); }, 8, 18);
 
     ganhoPad = ctx.createGain(); ganhoPad.gain.value = .3;
     var fPad = ctx.createBiquadFilter(); fPad.type = "lowpass"; fPad.frequency.value = 1050;
@@ -144,11 +151,24 @@ window.Som = (function () {
     }
   }
 
+  // Ao trocar de aba ou sair: esvazia o volume antes de pausar (corte seco estala)
+  var pausa = null;
+  function esconder() {
+    if (!ctx || ctx.state !== "running") return;
+    var t = ctx.currentTime;
+    mestre.gain.cancelScheduledValues(t);
+    mestre.gain.setValueAtTime(mestre.gain.value, t);
+    mestre.gain.setTargetAtTime(0, t, .03);
+    clearTimeout(pausa);
+    pausa = setTimeout(function () { if (document.hidden) ctx.suspend(); }, 150);
+  }
   document.addEventListener("visibilitychange", function () {
     if (!ctx) return;
-    if (document.hidden) ctx.suspend();
-    else if (ligado) ctx.resume();
+    if (document.hidden) { esconder(); return; }
+    clearTimeout(pausa);
+    if (ligado) ctx.resume().then(aplicar, function () {});
   });
+  window.addEventListener("pagehide", esconder);
 
   return {
     ligar: function () {
