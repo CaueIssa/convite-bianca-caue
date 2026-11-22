@@ -12,13 +12,15 @@ presentes" e "Baixar imagem".
 
 A tela de entrada mostra o monograma do casal (o mesmo da lista de presentes, em SVG dentro
 de `index.html`): o raminho balança como numa brisa e a estrela cintila. As cores e a
-animação ficam em `estilo.css` (`.lg-letras`, `.lg-ramo`, `.lg-estrela`). Quem usa "reduzir
-movimento" vê o monograma parado.
+animação ficam em `estilo.css` (`.lg-letras`, `.lg-ramo`, `.lg-estrela`). O mesmo monograma
+aparece clarinho atrás de "Bianca + Cauê" no convite (`#mono` em `index.html`, cores em `.mn-*`):
+surge com a rolagem, com o raminho vindo da esquerda e a estrela da direita. A imagem
+`convite-final.jpg` usa o mesmo monograma. Quem usa "reduzir movimento" vê tudo parado.
 
 ## Trocar o convite em imagem
 
 Substitua `convite-final.jpg` mantendo o mesmo nome. É a imagem do botão "Baixar imagem" e
-da prévia do link no WhatsApp. Ao trocar, aumente o número em `convite-final.jpg?v=2` no
+da prévia do link no WhatsApp. Ao trocar, aumente o número em `convite-final.jpg?v=3` no
 `og:image` de `index.html` para o WhatsApp buscar a prévia nova.
 
 ## Lista de presentes
@@ -70,5 +72,9 @@ para ler. Ele também comemora quando alguém copia o Pix. Quem usa "reduzir mov
 
 `musica.js` toca uma música alegre composta para a página (ukulele de nylon, piano macio,
 marimba, baixinho e chocalho, em Fá maior), gerada pelo navegador, sem arquivo de áudio.
-Ela começa pelo botão "Música" no canto da página. Quem entrou no convite com som ouve
-a música no primeiro toque na lista. Com a música tocando, o Apolo balança a cabeça no ritmo.
+Ela começa sozinha quando a pessoa entra na lista, e o botão "Música" no canto liga e
+desliga. Vindo do convite pelo botão "Lista de presentes", o Chrome (computador e Android)
+toca na hora. No iPhone, ou abrindo o link direto, o navegador exige um gesto antes de
+qualquer som: a música começa no primeiro toque, clique ou tecla na página. Fica quieta se
+a pessoa escolheu "Entrar sem som" no convite ou desligou a música na lista. Com a música
+tocando, o Apolo balança a cabeça no ritmo.

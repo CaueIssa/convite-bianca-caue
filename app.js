@@ -3,7 +3,9 @@
   var $ = function (id) { return document.getElementById(id); };
   var movimentoReduzido = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  var mono = $("mono"), letraB = mono.querySelector(".b"), letraC = mono.querySelector(".c");
+  var mono = $("mono"), logo = mono.querySelector(".mono-logo");
+  var parteRamo = mono.querySelector(".mono-ramo"), parteEstrela = mono.querySelector(".mono-estrela");
+  var unidadesPorPx = 1;   // escala do desenho do monograma (viewBox) por pixel da tela
   var nome = $("nome"), frase = $("frase"), dica = $("dica"), pular = $("pular"), botaoSom = $("som");
   var acoes = $("acoes");
 
@@ -29,14 +31,16 @@
       // No centro da tela o bloco cresce, mas nunca passa das margens
       b.k = Math.max(1, Math.min(b.kMax, (vw - 32) / Math.max(1, r.width)));
     });
-    // Monograma nasce atrás do nome e acompanha seu trajeto
+    // Monograma nasce atrás do nome e acompanha seu trajeto. O nome passa pelo meio
+    // das letras (44% da altura do desenho); no celular, o desenho cabe na largura da tela.
     var alvo = $("alvo-mono").getBoundingClientRect(), n = nome.getBoundingClientRect();
     var u = alvo.width / 690;
     mono.style.left = (n.left + n.width / 2) + "px";
     mono.style.top = (n.top + n.height / 2) + "px";
-    var cy = n.top + n.height / 2 - alvo.top;
-    letraB.style.left = (-345 + 86) * u + "px"; letraB.style.top = (-36 * u - cy) + "px";
-    letraC.style.left = (-345 + 308) * u + "px"; letraC.style.top = (34 * u - cy) + "px";
+    var lw = Math.min(760 * u, vw - 16), lh = lw * 1114 / 2166;
+    logo.style.width = lw + "px"; logo.style.height = lh + "px";
+    logo.style.left = (-lw / 2) + "px"; logo.style.top = (-lh * .44) + "px";
+    unidadesPorPx = 2166 / lw;
     aplicar(atual, true);
   }
 
@@ -61,8 +65,9 @@
     var n = BLOCOS[0], am = s(.30, .40, p), rm = 1 - s(n.b0, n.b1, p);
     mono.style.opacity = am;
     mono.style.transform = "translate(" + (n.dx * rm).toFixed(1) + "px," + (n.dy * rm).toFixed(1) + "px) scale(" + (1 + (n.k - 1) * rm).toFixed(4) + ")";
-    letraB.style.transform = "translateX(" + (-46 * (1 - am)).toFixed(1) + "px)";
-    letraC.style.transform = "translateX(" + (46 * (1 - am)).toFixed(1) + "px)";
+    var desl = 46 * (1 - am) * unidadesPorPx;
+    parteRamo.setAttribute("transform", "translate(" + (-desl).toFixed(1) + " 0)");
+    parteEstrela.setAttribute("transform", "translate(" + desl.toFixed(1) + " 0)");
 
     acoes.style.visibility = p > .875 ? "visible" : "hidden";
     dica.style.opacity = p < .015 ? 1 : 0;

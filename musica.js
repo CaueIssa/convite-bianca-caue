@@ -11,6 +11,7 @@ window.Musica = (function () {
   var VOLUME = .62;
   var ctx = null, mestre = null, eco = null, ruidoBuf = null, ondaPiano = null, ondaBaixo = null, cordas = {};
   var ligada = false, timer = null, passo = 0, proxTempo = 0, inicio = 0, pausa = null;
+  var aoMudar = function () {};   // avisa o botão quando o som de fato começa ou para
 
   function freq(nota) {
     var m = /^([A-G])(b|#)?(\d)$/.exec(nota);
@@ -44,6 +45,7 @@ window.Musica = (function () {
   /* ---------- Instrumentos ---------- */
   function montar() {
     ctx = new AC();
+    ctx.onstatechange = function () { aoMudar(); };
     mestre = ctx.createGain(); mestre.gain.value = 0;
     var tom = ctx.createBiquadFilter(); tom.type = "lowpass"; tom.frequency.value = 5200; tom.Q.value = .5;
     var comp = ctx.createDynamicsCompressor(); comp.threshold.value = -20; comp.ratio.value = 2.5; comp.attack.value = .01;
@@ -234,9 +236,13 @@ window.Musica = (function () {
     ctx.resume().then(function () { if (ligada) subir(VOLUME, .5); }, function () {});
   }
   document.addEventListener("visibilitychange", function () { if (document.hidden) esconder(); else mostrar(); });
-  // Alguns celulares só liberam o som num toque "de verdade": se ficou mudo, o próximo toque destrava
-  ["touchend", "click", "keydown"].forEach(function (t) {
-    document.addEventListener(t, function () {
+  // Os navegadores só liberam som depois de um gesto da pessoa. Vindo do convite (clique no
+  // botão da lista) o Chrome já libera na hora; no iPhone, ou abrindo o link direto, a música
+  // fica pronta e começa no primeiro toque, clique ou tecla em qualquer lugar da página.
+  // Toque em link não conta (a pessoa está saindo), e o botão "Música" cuida de si mesmo.
+  ["pointerdown", "pointerup", "touchend", "click", "keydown"].forEach(function (t) {
+    document.addEventListener(t, function (e) {
+      if (e.target && e.target.closest && e.target.closest("a[href], #musica")) return;
       if (ligada && ctx && ctx.state !== "running" && !document.hidden) {
         ctx.resume().then(function () { if (ligada) { comecarRelogio(); subir(VOLUME, .5); } }, function () {});
       }
@@ -257,44 +263,40 @@ window.Musica = (function () {
     }
   };
 
-  /* ---------- Botão ---------- */
+  /* ---------- Botão e início automático ---------- */
   var botao = document.getElementById("musica");
+  if (!AC) { if (botao) botao.hidden = true; return api; }
+  var tocando = function () { return ligada && ctx && ctx.state === "running"; };
+  var atualizar = function () {
+    if (!botao) return;
+    var t = tocando();
+    botao.setAttribute("aria-pressed", t ? "true" : "false");
+    botao.setAttribute("aria-label", t ? "Desligar a música" : "Ligar a música");
+    botao.classList.toggle("tocando", t);
+  };
+  aoMudar = atualizar;
+  var lembrar = function () { try { sessionStorage.setItem("convite-som", ligada ? "1" : "0"); } catch (e) {} };
+  var falou = false;
   if (botao) {
-    if (!AC) { botao.hidden = true; return api; }
-    var falou = false;
-    var atualizar = function () {
-      botao.setAttribute("aria-pressed", ligada ? "true" : "false");
-      botao.setAttribute("aria-label", ligada ? "Desligar a música" : "Ligar a música");
-      botao.classList.toggle("tocando", ligada);
-    };
-    var lembrar = function () { try { sessionStorage.setItem("convite-som", ligada ? "1" : "0"); } catch (e) {} };
-    var comecar = function () {
-      ligar(); atualizar(); lembrar();
-      if (!falou && window.Apolo) { falou = true; setTimeout(function () { Apolo.falar("Essa música fui eu que escolhi."); }, 900); }
-    };
-    var EVENTOS = ["pointerup", "touchend", "keydown"];
-    var soltarEspera = function () { EVENTOS.forEach(function (t) { document.removeEventListener(t, primeiroToque, true); }); };
-    // Quem entrou no convite com som ouve a música no primeiro toque na página.
-    // Não vale toque em link (a pessoa está saindo) nem arrastar para rolar a página.
-    var ini = null;
-    document.addEventListener("pointerdown", function (e) { ini = { x: e.clientX, y: e.clientY }; }, true);
-    var primeiroToque = function (e) {
-      var alvo = e.target && e.target.closest ? e.target : null;
-      if (alvo && alvo.closest("#musica, a[href]")) return;
-      if (e.type !== "keydown" && ini && e.clientX !== undefined && Math.hypot(e.clientX - ini.x, e.clientY - ini.y) > 12) return;
-      if (e.type === "touchend" && e.changedTouches && e.changedTouches[0] && ini &&
-          Math.hypot(e.changedTouches[0].clientX - ini.x, e.changedTouches[0].clientY - ini.y) > 12) return;
-      soltarEspera();
-      comecar();
-    };
     botao.addEventListener("click", function () {
-      soltarEspera();
-      if (ligada) { desligar(); atualizar(); lembrar(); } else comecar();
+      if (tocando()) desligar();
+      else {
+        ligar();
+        if (!falou && window.Apolo) { falou = true; setTimeout(function () { Apolo.falar("Essa música fui eu que escolhi."); }, 900); }
+      }
+      atualizar(); lembrar();
     });
-    var querSom = false;
-    try { querSom = sessionStorage.getItem("convite-som") === "1"; } catch (e) {}
-    if (querSom) EVENTOS.forEach(function (t) { document.addEventListener(t, primeiroToque, true); });
-    atualizar();
   }
+  // Começa sozinha ao entrar na lista. Só fica quieta se a pessoa escolheu "Entrar sem som"
+  // no convite ou desligou a música aqui mesmo (a escolha vale até fechar o navegador).
+  var escolha = null;
+  try { escolha = sessionStorage.getItem("convite-som"); } catch (e) {}
+  var autoIniciar = function () {
+    if (document.hidden) return;   // aberta em segundo plano: espera a aba aparecer
+    document.removeEventListener("visibilitychange", autoIniciar);
+    ligar(); atualizar();
+  };
+  if (escolha !== "0") { document.addEventListener("visibilitychange", autoIniciar); autoIniciar(); }
+  atualizar();
   return api;
 })();
